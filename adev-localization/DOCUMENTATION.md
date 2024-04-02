@@ -17,6 +17,15 @@
 Build command: `yarn docs:build`
 Publish directory: `dist/bind/adev/build/browser`
 
+## GitHub Actions
+
+- remove the bazel RBE GitHub Actions from preview build GitHub Action
+
+## Firebase Console
+
+- create a new project
+- retrieve the project id
+- retrieve the private key
 
 
 

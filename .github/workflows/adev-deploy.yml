@@ -5,12 +5,14 @@
 
 # https://securitylab.github.com/research/github-actions-preventing-pwn-requests/.
 
-name: Build adev for preview deployment
+name: Build adev for live deployment
 
 on:
-  pull_request:
+  push:
+    branches:
+      - main
 
-permissions: read-all
+permissions: write-all
 
 jobs:
   adev-build:
@@ -20,8 +22,6 @@ jobs:
         uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@5774b71c01a55c4c998f858ee37d3b77ae704c31
       - name: Setup Bazel
         uses: angular/dev-infra/github-actions/bazel/setup@5774b71c01a55c4c998f858ee37d3b77ae704c31
-      - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@5774b71c01a55c4c998f858ee37d3b77ae704c31
       - name: Install node modules
         run: yarn install --frozen-lockfile
       - name: Build adev to ensure it continues to work
@@ -32,12 +32,9 @@ jobs:
           pull-number: '${{github.event.pull_request.number}}'
           artifact-build-revision: '${{github.event.pull_request.head.sha}}'
           deploy-directory: './dist/bin/adev/build/browser'
-      - name: Deploy to Netlify
-        uses: nwtgck/actions-netlify@v3.0.0
+      - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-            publish-dir: './dist/bin/adev/build/browser'
-            github-token: ${{ secrets.GITHUB_TOKEN }}
-            deploy-message: "Deploy from GitHub Actions"
-        env:
-            NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-            NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_DOCS_ANGULARDEVS_FR }}'
+          channelId: live
+          projectId: docs-angulardevs-fr

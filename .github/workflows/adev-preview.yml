@@ -1,0 +1,37 @@
+# This workflow builds the previews for pull requests when a certain label is applied.
+# The actual deployment happens as part of a dedicated second workflow to avoid security
+# issues where the building would otherwise occur in an authorized context where secrets
+# could be leaked. More details can be found here:
+
+# https://securitylab.github.com/research/github-actions-preventing-pwn-requests/.
+
+name: Build adev for preview deployment
+
+on:
+  pull_request:
+
+permissions: write-all
+
+jobs:
+  adev-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Initialize environment
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@5774b71c01a55c4c998f858ee37d3b77ae704c31
+      - name: Setup Bazel
+        uses: angular/dev-infra/github-actions/bazel/setup@5774b71c01a55c4c998f858ee37d3b77ae704c31
+      - name: Install node modules
+        run: yarn install --frozen-lockfile
+      - name: Build adev to ensure it continues to work
+        run: yarn bazel build --config=aio_local_deps //adev:build
+      - uses: angular/dev-infra/github-actions/previews/pack-and-upload-artifact@5774b71c01a55c4c998f858ee37d3b77ae704c31
+        with:
+          workflow-artifact-name: 'adev-preview'
+          pull-number: '${{github.event.pull_request.number}}'
+          artifact-build-revision: '${{github.event.pull_request.head.sha}}'
+          deploy-directory: './dist/bin/adev/build/browser'
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_DOCS_ANGULARDEVS_FR }}'
+          projectId: docs-angulardevs-fr

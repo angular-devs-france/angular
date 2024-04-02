@@ -21,8 +21,8 @@ permissions:
   actions: read
 
 env:
-  PREVIEW_PROJECT: ng-dev-previews
-  PREVIEW_SITE: ng-dev-previews-fw
+  PREVIEW_PROJECT: docs-angulardevs-fr
+  PREVIEW_SITE: angular-docs-fr
 
 jobs:
   deploy:

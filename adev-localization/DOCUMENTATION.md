@@ -24,6 +24,14 @@
 - run firebase init hosting to get configuration files and add secrets on the GitHub repository
 
 
+# Application
+
+## index.html
+
+- update the title and the description of the application
+- update the language
+- update the different url towards the new one
+
 
 # Trouble Shooting
 
